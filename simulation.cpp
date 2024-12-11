@@ -85,7 +85,7 @@ public:
 
 
 
-    State = (A*State) + get_random_matrix(m, cov);;
+  State = (A*State) + get_random_matrix(m, cov);; // I'll just add the noise here cause i'm too lazy to make another sensor class just to add noise
   }
 
 };
