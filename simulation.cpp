@@ -57,6 +57,14 @@ public:
 
   
   void tick() {
+
+
+    State = (A*State); // I'll just add the noise here cause i'm too lazy to make another sensor class just to add noise
+  }
+
+};
+
+Eigen::Matrix<float, 3, 1> sensor_data_ret(Projectile p) {
   Eigen::Matrix<float, 7, 1> m;
   m << 0, 0, 0, 0, 0, 0, 0;
 
@@ -73,9 +81,9 @@ public:
   //   ;
 
   cov <<								\
-    0.01, 0.0000005,   0.0000005,    0,    0,    0,    0,			\
-    0.0000005,   0.01, 0.0000005,    0,    0,    0,    0,			\
-    0.0000005,   0.0000005,   0.01,  0,    0,    0,    0,			\
+    0.1, 0.0000005,   0.0000005,    0,    0,    0,    0,			\
+    0.0000005,   0.1, 0.0000005,    0,    0,    0,    0,			\
+    0.0000005,   0.0000005,   0.1,  0,    0,    0,    0,			\
     0,   0,   0,    0.00000001,  0.00, 0.0000, 0,				\
     0,   0,   0,    0.0000, 0.00000001,  0.0000, 0,				\
     0,   0,   0,    0.0000, 0.0000, 0.0000001,  0,				\
@@ -85,10 +93,19 @@ public:
 
 
 
-  State = (A*State) + get_random_matrix(m, cov);; // I'll just add the noise here cause i'm too lazy to make another sensor class just to add noise
-  }
+  Eigen::Matrix<float, 3, 1> ret;
 
-};
+  Eigen::Matrix<float, 7, 1> test = p.State;
+
+  test += get_random_matrix(m, cov);
+
+
+  ret(0,0) = test(0,0);
+  ret(1,0) = test(1,0);
+  ret(2,0) = test(2,0);
+  
+  return ret;
+}
 
 
 std::ostream &operator<<(std::ostream &os, Projectile p) {
@@ -137,9 +154,9 @@ public:
       ;
 
     cov_noise_sensor <<		
-      0.1, 0.05,   0.05,
-      0.05,   0.1, 0.05,
-      0.05,   0.005,  0.1 ;
+      0.01, 0.005,   0.005,
+      0.005,   0.01, 0.005,
+      0.005,   0.005,  0.01 ;
     
 
     P << \
@@ -189,8 +206,8 @@ std::ostream &operator<<(std::ostream &os, Kalman p) {
 
 int main() {
   //           x     y    z    vx  vy    vz     g     T
-  Projectile P(0.0, 0.0, 0.0, 5.0, 5.0, 10.0, 9.81, 0.010);
-  Kalman F(0.0, 0.0, 0.0, 4.0, 7.0, 15.0, 9.81, 0.010);
+  Projectile P(0.0, 0.0, 0.0, 5.0, 5.0, 33.0, 9.81, 0.010);
+  Kalman F(1.0, 1.0, 0.50, 4.0, 7.0, 15.0, 9.81, 0.010);
 
   std::ofstream fs("data.txt", std::ios::out);
 
@@ -204,17 +221,14 @@ int main() {
   for (int i=0; i<1000; i++) {
     if (P.State(2,0) < 0) break;
     fs << P << "    "; // << std::endl;
-    tosend(0,0) = P.State(0,0);
-    tosend(1,0) = P.State(1,0);
-    tosend(2,0) = P.State(2,0);
+    tosend = sensor_data_ret(P);
     F.predict();
-    fs << F;
+    fs << F << "    ";
+    fs << tosend(0,0) << "    " << tosend(1,0) << "    " << tosend(2,0) ;
     fs <<  std::endl;
     F.update(tosend);
     P.tick();
-
   }
 
-}
-  
+} 
   
