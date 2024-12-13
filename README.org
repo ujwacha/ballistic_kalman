@@ -1,0 +1,32 @@
+#+TITLE: Kalman FIlter Implementation Report
+#+Author: Acharya U
+#+PROPERTY: 
+
+* Equations of Motion Used 
+The Equations of Motion Used Are:
+1) \[ s_t = s_o + v_{t-1}\times T \]
+2) \[ v_t = v_{t-1}+ a \times T \]
+
+* State Vector
+This is the state vector $\vec{X}$
+
+\begin{bmatrix}
+x \\
+y \\
+z \\
+v_x \\
+v_y \\
+v_z \\
+a_z \\
+\end{bmatrix}
+
+$a_z$ is always going to be $9.81$, it will never change but i needed g in the equation so that i can write the $A$ matrix.
+
+Transition state:
+\[ X_{t+1} = A \times X_t \]
+
+There is no noise as we are not taking any sensor measurements, so i have not put the white noise
+
+
+
+
