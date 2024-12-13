@@ -1,14 +1,15 @@
-#+TITLE: Kalman FIlter Implementation Report
+#+TITLE: Kalman Filter Implementation Report
 #+Author: Acharya U
 #+PROPERTY: 
 
 * Equations of Motion Used 
 The Equations of Motion Used Are:
-1) $s_t = s_o + v_{t-1}\times T$
-2) $v_t = v_{t-1}+ a \times T$
+1) $s_t = s_o + v_{t-1}T + \frac{ 1 }{ 2 } a T ^2$
+2) $v_t = v_{t-1}+ a T$
 
 * State Vector
 This is the state vector $\vec{X}$
+
 \begin{math}
 \vec{X} = 
 \begin{bmatrix}
@@ -27,8 +28,114 @@ $a_z$ is always going to be $9.81$, it will never change but i needed g in the e
 Transition state:
 \[ X_{t+1} = A \times X_t \]
 
-There is no noise as we are not taking any sensor measurements, so i have not put the white noise
+There is no noise as we are not taking any sensor measurements, so I have not put the white noise
+* Equations for prediction step
+The equations governing the model are:
+
+\[ x^{t+1} = x^t + v^{xt} \times T \]
+
+\[ y^{t+1} = y^t + v^{yt} \times T \]
+
+\[ z^{t+1} = z^t + v^{zt} \times T - \frac{ 1 }{ 2 } g T^2 \]
+
+\[ v_x^{t+1} = v_x^t \]
+
+\[ v_y^{t+1} = v_y^t \]
+
+\[ v_z^{t+1} = v_x^t - gT \]
+
+So The State Transition Equation Looks like this
+
+
+\begin{math}
+\begin{bmatrix}
+x \\
+y \\
+z \\
+v_x \\
+v_y \\
+v_z \\
+a_z \\
+\end{bmatrix}
+_{t+1}
+=
+\begin{bmatrix}
+1 & 0 & 0 & T & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & T & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & T & - \frac{ 1 }{ 2 } T^2 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & -T \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\times
+\begin{bmatrix}
+x \\
+y \\
+z \\
+v_x \\
+v_y \\
+v_z \\
+a_z \\
+\end{bmatrix}
+_{t}
+\end{math}
+
+
+Which can be rewritten as:
+
+\[ X_{t+1} = A \times X_t \]
+
+* Equation for the update state
+The assumption is that the camera will give us noisy $X$ , $Y$ and $Z$ coordinates. In real life we will have to adjust vibrations in the camera with it's inbuilt IMU, but for simplicity that is not taken into account
+
+so for the equation
+
+\[ Y_t = CX_t + V_t\]
+
+which is used in the update state,
+
+\begin{math}
+Y =
+\begin{bmatrix}
+X \\
+Y \\
+Z
+\end{bmatrix}
+\end{math}
+
+So The Equation is,
+
+\begin{math}
+\begin{bmatrix}
+X \\
+Y \\
+Z \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0  \\
+0 & 1 & 0 & 0 & 0 & 0 & 0  \\
+0 & 0 & 1 & 0 & 0 & 0 & 0  \\
+\end{bmatrix}
+\times
+\begin{bmatrix}
+x \\
+y \\
+z \\
+v_x \\
+v_y \\
+v_z \\
+a_z \\
+\end{bmatrix}
++
+V
+\end{math}
 
 
 
+The random vector $V$, during simulation is calculated so that it has a specefic covariance matrix and mean using the cholesky distribution methood.
 
+The function calculating the sensor data in the simulation takes the projectile sate as input, adds a noise to it and takes the first 3 elements and returns them as a vector
+
+The Covariance matrix of V is defined in the Kalman Filter Class
