@@ -9,7 +9,8 @@ The Equations of Motion Used Are:
 
 * State Vector
 This is the state vector $\vec{X}$
-
+\begin{math}
+\vec{X} = 
 \begin{bmatrix}
 x \\
 y \\
@@ -19,6 +20,7 @@ v_y \\
 v_z \\
 a_z \\
 \end{bmatrix}
+\end{math}
 
 $a_z$ is always going to be $9.81$, it will never change but i needed g in the equation so that i can write the $A$ matrix.
 
