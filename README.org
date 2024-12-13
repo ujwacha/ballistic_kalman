@@ -4,8 +4,8 @@
 
 * Equations of Motion Used 
 The Equations of Motion Used Are:
-1) \[ s_t = s_o + v_{t-1}\times T \]
-2) \[ v_t = v_{t-1}+ a \times T \]
+1) $s_t = s_o + v_{t-1}\times T$
+2) $v_t = v_{t-1}+ a \times T$
 
 * State Vector
 This is the state vector $\vec{X}$
